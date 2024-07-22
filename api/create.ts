@@ -50,6 +50,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   asciiCtx.fillRect(0, 0, width, height);
   asciiCtx.font = `${cellSize}px monospace`;
 
+  // ピクセルデータの確認
+  let allZero = true;
+  let all255 = true;
+  let someOtherValue = false;
+
+  for (let i = 0; i < pixels.length; i += 4) {
+    const r = pixels[i];
+    const g = pixels[i + 1];
+    const b = pixels[i + 2];
+
+    if (r !== 0 || g !== 0 || b !== 0) allZero = false;
+    if (r !== 255 || g !== 255 || b !== 255) all255 = false;
+    if ((r !== 0 && r !== 255) || (g !== 0 && g !== 255) || (b !== 0 && b !== 255)) {
+      someOtherValue = true;
+      break;
+    }
+  }
+
+  console.log('All pixels are black:', allZero);
+  console.log('All pixels are white:', all255);
+  console.log('Some pixels have other values:', someOtherValue);
+  console.log('Sample pixel data:', pixels.slice(0, 20));
+
   for (let y = 0; y < height; y += cellSize) {
     for (let x = 0; x < width; x += cellSize) {
       const pos = (y * width + x) * 4;
