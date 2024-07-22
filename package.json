@@ -6,9 +6,6 @@
   "bugs": {
     "url": "https://github.com/phaserjs/template-react-ts/issues"
   },
-  "scripts": {
-    "dev": "vercel dev"
-  },
   "private": true,
   "devDependencies": {
     "@types/node": "^20.13.0",
