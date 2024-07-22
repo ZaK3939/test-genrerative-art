@@ -51,10 +51,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const asciiCanvas = createCanvas(width, height);
     const asciiCtx = asciiCanvas.getContext('2d');
-    // asciiCtx.fillStyle = 'black';
-    // asciiCtx.fillRect(0, 0, width, height);
-    // asciiCtx.font = `${cellSize}px monospace`;
-    // asciiCtx.textBaseline = 'top';
+    asciiCtx.fillStyle = 'black';
+    asciiCtx.fillRect(0, 0, width, height);
+    asciiCtx.font = `${cellSize}px monospace`;
+    asciiCtx.textBaseline = 'top';
     let charCounts = {};
     asciiChars.forEach((char) => (charCounts[char] = 0));
 
@@ -88,10 +88,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('First 100 ASCII pixel values:', asciiPixels.slice(0, 400));
 
     // アドレスとデータ値の追加
-    // asciiCtx.font = '20px Arial';
-    // asciiCtx.fillStyle = 'white';
-    // asciiCtx.fillText(`Address: ${address}`, 10, 30);
-    // asciiCtx.fillText(`Data: ${data}`, 10, 60);
+    asciiCtx.font = '20px Arial';
+    asciiCtx.fillStyle = 'white';
+    asciiCtx.fillText(`Address: ${address}`, 10, 30);
+    asciiCtx.fillText(`Data: ${data}`, 10, 60);
 
     // キャンバスをバッファに変換
     const buf = asciiCanvas.toBuffer('image/png');
