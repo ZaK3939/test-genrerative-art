@@ -44,10 +44,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Create a new canvas for ASCII art
   const asciiCanvas = createCanvas(width, height);
   const asciiCtx = asciiCanvas.getContext('2d');
-  asciiCtx.fillStyle = 'white';
+  asciiCtx.fillStyle = 'black'; // 背景を黒に
   asciiCtx.fillRect(0, 0, width, height);
   asciiCtx.font = `${cellSize}px monospace`;
-  asciiCtx.fillStyle = 'black';
+  asciiCtx.fillStyle = 'white'; // 文字を白に
 
   for (let y = 0; y < height; y += cellSize) {
     for (let x = 0; x < width; x += cellSize) {
