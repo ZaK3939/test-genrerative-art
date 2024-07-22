@@ -5,6 +5,7 @@ import fs from 'fs';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { address = '0x0', data = '0' } = req.query;
+  console.log(`Creating image for address: ${address} with data: ${data}`);
 
   // Convert data to number and calculate resolution
   const dataValue = parseInt(data as string, 10);
@@ -17,6 +18,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     minResolution,
     Math.min(maxResolution, Math.round(maxResolution - (dataValue / maxValue) * (maxResolution - minResolution))),
   );
+  console.log(`Resolution: ${resolution}`);
 
   const width = 512;
   const height = 512;
@@ -25,6 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Load image
   const imagePath = path.join(process.cwd(), 'assets', 'images', 'uniswap.png');
+  console.log(`Loading image from: ${imagePath}`);
   const image = await loadImage(fs.readFileSync(imagePath));
 
   // Draw image
