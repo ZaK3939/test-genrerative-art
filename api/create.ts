@@ -5,39 +5,42 @@ import path from 'path';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    const { address = '0x0', data = '10' } = req.query;
+    const { address, data } = req.query;
+    if (!address || !data) {
+      return new Response('Invalid address or value.', { status: 400 });
+    }
 
+    // Parse data value and calculate cell size
     const dataValue = parseInt(data as string, 10);
     const maxValue = 1000;
-    const minCellSize = 4;
+    const minCellSize = 0;
     const maxCellSize = 20;
-    const cellSize = Math.max(
-      minCellSize,
-      Math.min(maxCellSize, Math.round(minCellSize + (dataValue / maxValue) * (maxCellSize - minCellSize))),
-    );
+    const cellSize = Math.max(minCellSize, Math.min(maxCellSize, Math.round((dataValue / maxValue) * maxCellSize)));
 
     const width = 512;
     const height = 512;
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
 
+    // Register custom font
     const fontPath = path.join(process.cwd(), 'assets/fonts', 'Verdana.ttf');
     GlobalFonts.registerFromPath(fontPath, 'CustomFont');
     console.log(GlobalFonts.families);
-    // 画像ファイルを読み込み、Base64に変換
+
+    // Load and convert image to Base64
     const imagePath = path.join(process.cwd(), 'assets', 'images', 'uniswap.png');
     console.log('Image path:', imagePath);
     const imageBuffer = fs.readFileSync(imagePath);
     const base64Image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
 
-    // Base64画像を読み込み
+    // Load Base64 image
     const image = await loadImage(base64Image);
     console.log('Image loaded:', image.width, image.height);
 
-    // 画像の描画
+    // Draw image on canvas
     ctx.drawImage(image, 0, 0, width, height);
 
-    // ピクセルデータの取得
+    // Get pixel data
     const imageData = ctx.getImageData(0, 0, width, height);
     console.log('Image data:', imageData.data);
     const pixels = imageData.data;
@@ -46,7 +49,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('Cell size:', cellSize);
     console.log('Canvas dimensions:', width, 'x', height);
 
-    const asciiChars = ['@', '%', '#', '*', '+', '=', '-', ':', '.', ' '];
+    // Extended ASCII characters
+    const asciiChars = ['@', '%', '#', '*', '+', '=', '-', ':', '.', ' ', '&', '_', '£', '/', 'X', 'W'];
     console.log('ASCII characters:', asciiChars);
 
     const asciiCanvas = createCanvas(width, height);
@@ -58,6 +62,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let charCounts = {};
     asciiChars.forEach((char) => (charCounts[char] = 0));
 
+    // Function to convert brightness to ASCII symbol
+    function convertToSymbol(brightness: number): string {
+      const index = Math.floor((brightness / 255) * (asciiChars.length - 1));
+      return asciiChars[index];
+    }
+
     for (let y = 0; y < height; y += cellSize) {
       for (let x = 0; x < width; x += cellSize) {
         const pos = (y * width + x) * 4;
@@ -65,10 +75,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const g = pixels[pos + 1];
         const b = pixels[pos + 2];
         const avg = (r + g + b) / 3;
-        const charIndex = Math.floor((avg / 255) * (asciiChars.length - 1));
-        const char = asciiChars[charIndex];
+        const char = convertToSymbol(avg);
 
-        // 文字の使用回数をカウント
+        // Count character usage
         charCounts[char]++;
 
         asciiCtx.fillStyle = `rgb(${r},${g},${b})`;
@@ -81,23 +90,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log(`'${char}': ${count}`);
     }
 
-    // asciiCtxの内容を確認
+    // Check ASCII context content
     const asciiImageData = asciiCtx.getImageData(0, 0, width, height);
     const asciiPixels = asciiImageData.data;
 
     console.log('First 100 ASCII pixel values:', asciiPixels.slice(0, 400));
 
-    // アドレスとデータ値の追加
+    // Add address and data value
     asciiCtx.font = '20px Verdana';
     asciiCtx.fillStyle = 'white';
     asciiCtx.fillText(`Address: ${address}`, 10, 30);
     asciiCtx.fillText(`Data: ${data}`, 10, 60);
 
-    // キャンバスをバッファに変換
+    // Convert canvas to buffer
     const buf = asciiCanvas.toBuffer('image/png');
     console.log('Buffer created, length:', buf.length);
 
-    // レスポンスヘッダーの設定とバッファの送信
+    // Set response headers and send buffer
     res.setHeader('Content-Type', 'image/png');
     res.status(200).send(buf);
   } catch (error) {
