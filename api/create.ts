@@ -33,8 +33,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // const imageData = await fetch(new URL('../../assets/p.png', import.meta.url)).then((res) => res.arrayBuffer());
 
-  const image = await loadImage(fs.readFileSync(imagePath));
-  console.log('image', image);
+  let image;
+  try {
+    const imageBuffer = fs.readFileSync(imagePath);
+    image = await loadImage(imageBuffer);
+    console.log('Image loaded successfully', image.width, image.height);
+  } catch (error) {
+    console.error('Error loading image:', error);
+    return res.status(500).json({ error: 'Failed to load image' });
+  }
   // 画像の描画
   ctx.drawImage(image, 0, 0, width, height);
 
