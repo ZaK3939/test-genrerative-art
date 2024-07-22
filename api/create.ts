@@ -21,7 +21,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
 
-  const imagePath = path.join(process.cwd(), 'assets', 'images', 'uniswap.png');
+  const imagePath = path.join(process.cwd(), 'assets/images', 'uniswap.png');
+  console.log('imagePath', imagePath);
   const image = await loadImage(fs.readFileSync(imagePath));
 
   // 画像の描画
@@ -41,6 +42,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   asciiCtx.fillStyle = 'black';
   asciiCtx.fillRect(0, 0, width, height);
   asciiCtx.font = `${cellSize}px monospace`;
+  console.log('cellSize', cellSize);
 
   for (let y = 0; y < height; y += cellSize) {
     for (let x = 0; x < width; x += cellSize) {
