@@ -97,10 +97,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('First 100 ASCII pixel values:', asciiPixels.slice(0, 400));
 
     // Add address and data value
-    asciiCtx.font = '20px Roboto';
-    asciiCtx.fillStyle = 'black';
-    asciiCtx.fillText(`Address: ${address.substring(0, 5)}`, 10, 30);
-    asciiCtx.fillText(`Data: ${data}`, 10, 60);
+    // asciiCtx.font = '20px Roboto';
+    // asciiCtx.fillStyle = 'black';
+    // asciiCtx.fillText(`Address: ${address.substring(0, 5)}`, 10, 30);
+    // asciiCtx.fillText(`Data: ${data}`, 10, 60);
 
     // Convert canvas to buffer
     const buf = asciiCanvas.toBuffer('image/png');
