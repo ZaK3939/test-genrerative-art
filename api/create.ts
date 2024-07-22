@@ -5,7 +5,7 @@ import path from 'path';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    const { address = '0x0', data = '0' } = req.query;
+    const { address = '0x0', data = '10' } = req.query;
 
     const dataValue = parseInt(data as string, 10);
     const maxValue = 1000;
@@ -52,6 +52,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // asciiCtx.fillRect(0, 0, width, height);
     // asciiCtx.font = `${cellSize}px monospace`;
     // asciiCtx.textBaseline = 'top';
+    let charCounts = {};
+    asciiChars.forEach((char) => (charCounts[char] = 0));
 
     for (let y = 0; y < height; y += cellSize) {
       for (let x = 0; x < width; x += cellSize) {
@@ -63,22 +65,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const charIndex = Math.floor((avg / 255) * (asciiChars.length - 1));
         const char = asciiChars[charIndex];
 
+        // 文字の使用回数をカウント
+        charCounts[char]++;
+
         asciiCtx.fillStyle = `rgb(${r},${g},${b})`;
         asciiCtx.fillText(char, x, y);
       }
+    }
+
+    console.log('ASCII character usage:');
+    for (const [char, count] of Object.entries(charCounts)) {
+      console.log(`'${char}': ${count}`);
     }
 
     // asciiCtxの内容を確認
     const asciiImageData = asciiCtx.getImageData(0, 0, width, height);
     const asciiPixels = asciiImageData.data;
 
-    console.log('First 100 ASCII pixel values:', asciiPixels.slice(0, 400)); // RGBAなので400個表示
-
-    const image2 = await loadImage(asciiPixels);
-    console.log('Image loaded:', image2.width, image2.height);
-
-    // 画像の描画
-    ctx.drawImage(image2, 0, 0, width, height);
+    console.log('First 100 ASCII pixel values:', asciiPixels.slice(0, 400));
 
     // アドレスとデータ値の追加
     // asciiCtx.font = '20px Arial';
