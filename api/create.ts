@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { createCanvas, loadImage } from '@napi-rs/canvas';
+import { GlobalFonts, createCanvas, loadImage } from '@napi-rs/canvas';
 import fs from 'fs';
 import path from 'path';
 
@@ -21,6 +21,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
 
+    const fontPath = path.join(process.cwd(), 'assets/fonts', 'Roboto-Bold.ttf');
+    GlobalFonts.registerFromPath(fontPath, 'CustomFont');
+    console.log(GlobalFonts.families);
     // 画像ファイルを読み込み、Base64に変換
     const imagePath = path.join(process.cwd(), 'assets', 'images', 'uniswap.png');
     console.log('Image path:', imagePath);
