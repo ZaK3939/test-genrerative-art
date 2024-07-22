@@ -4,7 +4,17 @@ import path from 'path';
 import fs from 'fs';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { address = '0x0', data = '0' } = req.query;
+  const { address = '0x0', data = '0', original = 'false' } = req.query;
+
+  const imagePath = path.join(process.cwd(), 'assets/images', 'uniswap.png');
+  console.log('imagePath', imagePath);
+
+  // オリジナル画像を返すオプション
+  if (original === 'true') {
+    const imageBuffer = fs.readFileSync(imagePath);
+    res.setHeader('Content-Type', 'image/png');
+    return res.status(200).send(imageBuffer);
+  }
 
   // データ値をセルサイズに変換
   const dataValue = parseInt(data as string, 10);
@@ -21,9 +31,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
 
-  const imagePath = path.join(process.cwd(), 'assets/images', 'uniswap.png');
   // const imageData = await fetch(new URL('../../assets/p.png', import.meta.url)).then((res) => res.arrayBuffer());
-  console.log('imagePath', imagePath);
+
   const image = await loadImage(fs.readFileSync(imagePath));
 
   // 画像の描画
