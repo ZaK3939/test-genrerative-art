@@ -57,7 +57,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const asciiCtx = asciiCanvas.getContext('2d');
     asciiCtx.fillStyle = 'black';
     asciiCtx.fillRect(0, 0, width, height);
-    asciiCtx.font = `${cellSize}px Roboto-Bold`;
+    asciiCtx.font = `${cellSize}px Roboto`;
     asciiCtx.textBaseline = 'top';
     let charCounts = {};
     asciiChars.forEach((char) => (charCounts[char] = 0));
@@ -97,7 +97,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('First 100 ASCII pixel values:', asciiPixels.slice(0, 400));
 
     // Add address and data value
-    asciiCtx.font = '20px Roboto-Bold';
+    asciiCtx.font = '20px Roboto';
     asciiCtx.fillStyle = 'black';
     asciiCtx.fillText(`Address: ${address.substring(0, 5)}`, 10, 30);
     asciiCtx.fillText(`Data: ${data}`, 10, 60);
