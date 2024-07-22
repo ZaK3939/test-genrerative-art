@@ -35,6 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const imageBuffer = fs.readFileSync(imagePath);
   const base64Image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
+  console.log('base64Image', base64Image);
 
   // Base64画像を読み込み
   const image = await loadImage(base64Image);
