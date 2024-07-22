@@ -53,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const asciiCtx = asciiCanvas.getContext('2d');
     asciiCtx.fillStyle = 'black';
     asciiCtx.fillRect(0, 0, width, height);
-    asciiCtx.font = `${cellSize}px monospace`;
+    asciiCtx.font = `${cellSize}px Roboto`;
     asciiCtx.textBaseline = 'top';
     let charCounts = {};
     asciiChars.forEach((char) => (charCounts[char] = 0));
