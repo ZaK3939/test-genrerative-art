@@ -21,19 +21,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
 
-  // const imagePath = path.join(process.cwd(), 'assets/images', 'uniswap.png');
-  // // const imageData = await fetch(new URL('../../assets/p.png', import.meta.url)).then((res) => res.arrayBuffer());
-  // console.log('imagePath', imagePath);
-  // const image = await loadImage(fs.readFileSync(imagePath));
-  const imageData = await fetch(new URL('../../assets/images/uniswap.png', import.meta.url)).then((res) =>
-    res.arrayBuffer(),
-  );
-  const image = await loadImage(Buffer.from(imageData));
+  const imagePath = path.join(process.cwd(), 'assets/images', 'uniswap.png');
+  // const imageData = await fetch(new URL('../../assets/p.png', import.meta.url)).then((res) => res.arrayBuffer());
+  console.log('imagePath', imagePath);
+  const image = await loadImage(fs.readFileSync(imagePath));
 
   // 画像の描画
   ctx.drawImage(image, 0, 0, width, height);
+
   // ピクセルデータの取得
-  const pixels = ctx.getImageData(0, 0, width, height).data;
+  const imageData = ctx.getImageData(0, 0, width, height);
+  console.log('imageData', imageData);
+  const pixels = imageData.data;
 
   // ASCII変換
   const asciiChars = ['@', '*', '+', '#', '&', '%', '_', ':', '£', '/', '-', 'X', 'W', ' '];
