@@ -34,7 +34,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // const imageData = await fetch(new URL('../../assets/p.png', import.meta.url)).then((res) => res.arrayBuffer());
 
   const image = await loadImage(fs.readFileSync(imagePath));
-
+  console.log('image', image);
   // 画像の描画
   ctx.drawImage(image, 0, 0, width, height);
 
