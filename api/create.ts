@@ -49,18 +49,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     asciiCtx.font = `${cellSize}px monospace`;
     asciiCtx.textBaseline = 'top';
 
-    for (let y = 0; y < height; y += cellSize) {
-      for (let x = 0; x < width; x += cellSize) {
-        const pos = (y * width + x) * 4;
-        const r = pixels[pos];
-        const g = pixels[pos + 1];
-        const b = pixels[pos + 2];
-        const avg = (r + g + b) / 3;
-        const charIndex = Math.floor((avg / 255) * (asciiChars.length - 1));
-        asciiCtx.fillStyle = `rgb(${r},${g},${b})`;
-        asciiCtx.fillText(asciiChars[charIndex], x, y);
-      }
-    }
+    // for (let y = 0; y < height; y += cellSize) {
+    //   for (let x = 0; x < width; x += cellSize) {
+    //     const pos = (y * width + x) * 4;
+    //     const r = pixels[pos];
+    //     const g = pixels[pos + 1];
+    //     const b = pixels[pos + 2];
+    //     const avg = (r + g + b) / 3;
+    //     const charIndex = Math.floor((avg / 255) * (asciiChars.length - 1));
+    //     asciiCtx.fillStyle = `rgb(${r},${g},${b})`;
+    //     asciiCtx.fillText(asciiChars[charIndex], x, y);
+    //   }
+    // }
 
     // アドレスとデータ値の追加
     asciiCtx.font = '20px Arial';
