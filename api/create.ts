@@ -21,7 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
 
-    const fontPath = path.join(process.cwd(), 'assets/fonts', 'Roboto-Bold.ttf');
+    const fontPath = path.join(process.cwd(), 'assets/fonts', 'Verdana.ttf');
     GlobalFonts.registerFromPath(fontPath, 'CustomFont');
     console.log(GlobalFonts.families);
     // 画像ファイルを読み込み、Base64に変換
@@ -53,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const asciiCtx = asciiCanvas.getContext('2d');
     asciiCtx.fillStyle = 'black';
     asciiCtx.fillRect(0, 0, width, height);
-    asciiCtx.font = `${cellSize}px Roboto`;
+    asciiCtx.font = `${cellSize}px Verdana`;
     asciiCtx.textBaseline = 'top';
     let charCounts = {};
     asciiChars.forEach((char) => (charCounts[char] = 0));
@@ -88,7 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('First 100 ASCII pixel values:', asciiPixels.slice(0, 400));
 
     // アドレスとデータ値の追加
-    asciiCtx.font = '20px Roboto';
+    asciiCtx.font = '20px Verdana';
     asciiCtx.fillStyle = 'white';
     asciiCtx.fillText(`Address: ${address}`, 10, 30);
     asciiCtx.fillText(`Data: ${data}`, 10, 60);
