@@ -74,6 +74,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log('First 100 ASCII pixel values:', asciiPixels.slice(0, 400)); // RGBAなので400個表示
 
+    const image2 = await loadImage(asciiPixels);
+    console.log('Image loaded:', image2.width, image2.height);
+
+    // 画像の描画
+    ctx.drawImage(image2, 0, 0, width, height);
+
     // アドレスとデータ値の追加
     // asciiCtx.font = '20px Arial';
     // asciiCtx.fillStyle = 'white';
