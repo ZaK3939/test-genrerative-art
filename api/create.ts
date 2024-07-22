@@ -1,103 +1,80 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { address = '0x0', data = '0', original = 'false' } = req.query;
+  try {
+    const { address = '0x0', data = '0' } = req.query;
 
-  const imagePath = path.join(process.cwd(), 'assets/images', 'uniswap.png');
-  console.log('imagePath', imagePath);
+    const dataValue = parseInt(data as string, 10);
+    const maxValue = 1000;
+    const minCellSize = 4;
+    const maxCellSize = 20;
+    const cellSize = Math.max(
+      minCellSize,
+      Math.min(maxCellSize, Math.round(minCellSize + (dataValue / maxValue) * (maxCellSize - minCellSize))),
+    );
 
-  // オリジナル画像を返すオプション
-  if (original === 'true') {
+    const width = 512;
+    const height = 512;
+    const canvas = createCanvas(width, height);
+    const ctx = canvas.getContext('2d');
+
+    // 画像ファイルを読み込み、Base64に変換
+    const imagePath = path.join(process.cwd(), 'assets', 'images', 'uniswap.png');
     const imageBuffer = fs.readFileSync(imagePath);
-    res.setHeader('Content-Type', 'image/png');
-    return res.status(200).send(imageBuffer);
-  }
+    const base64Image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
 
-  // データ値をセルサイズに変換
-  const dataValue = parseInt(data as string, 10);
-  const maxValue = 1000;
-  const minCellSize = 4;
-  const maxCellSize = 20;
-  const cellSize = Math.max(
-    minCellSize,
-    Math.min(maxCellSize, Math.round(minCellSize + (dataValue / maxValue) * (maxCellSize - minCellSize))),
-  );
+    // Base64画像を読み込み
+    const image = await loadImage(base64Image);
+    console.log('Image loaded:', image.width, image.height);
 
-  const width = 512;
-  const height = 512;
-  const canvas = createCanvas(width, height);
-  const ctx = canvas.getContext('2d');
+    // 画像の描画
+    ctx.drawImage(image, 0, 0, width, height);
 
-  // const imageData = await fetch(new URL('../../assets/p.png', import.meta.url)).then((res) => res.arrayBuffer());
+    // ピクセルデータの取得
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const pixels = imageData.data;
 
-  const imageBuffer = fs.readFileSync(imagePath);
-  const base64Image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
-  const image = await loadImage(base64Image);
-  ctx.drawImage(image, 0, 0, width, height);
-  const imageData = ctx.getImageData(0, 0, width, height);
-  const pixels = imageData.data;
+    // ASCII変換
+    const asciiChars = ['@', '*', '+', '#', '&', '%', '_', ':', '£', '/', '-', 'X', 'W', ' '];
 
-  // ASCII変換
-  const asciiChars = ['@', '*', '+', '#', '&', '%', '_', ':', '£', '/', '-', 'X', 'W', ' '];
+    // ASCIIアート用の新しいキャンバス
+    const asciiCanvas = createCanvas(width, height);
+    const asciiCtx = asciiCanvas.getContext('2d');
+    asciiCtx.fillStyle = 'black';
+    asciiCtx.fillRect(0, 0, width, height);
+    asciiCtx.font = `${cellSize}px monospace`;
+    asciiCtx.textBaseline = 'top';
 
-  // ASCIIアート用の新しいキャンバス
-  const asciiCanvas = createCanvas(width, height);
-  const asciiCtx = asciiCanvas.getContext('2d');
-  asciiCtx.fillStyle = 'white';
-  asciiCtx.fillRect(0, 0, width, height);
-  asciiCtx.font = `${cellSize}px monospace`;
-
-  let debugOutput = '';
-  for (let y = 0; y < height; y += cellSize) {
-    for (let x = 0; x < width; x += cellSize) {
-      const pos = (y * width + x) * 4;
-      const r = pixels[pos];
-      const g = pixels[pos + 1];
-      const b = pixels[pos + 2];
-      const avg = (r + g + b) / 3;
-      const charIndex = Math.floor((avg / 255) * (asciiChars.length - 1));
-
-      // デバッグ情報を追加
-      if (x < 50 && y < 50) {
-        // 最初の数ピクセルのみ出力
-        debugOutput += `Pos: (${x},${y}), RGB: (${r},${g},${b}), Avg: ${avg}, Char: ${asciiChars[charIndex]}\n`;
+    for (let y = 0; y < height; y += cellSize) {
+      for (let x = 0; x < width; x += cellSize) {
+        const pos = (y * width + x) * 4;
+        const r = pixels[pos];
+        const g = pixels[pos + 1];
+        const b = pixels[pos + 2];
+        const avg = (r + g + b) / 3;
+        const charIndex = Math.floor((avg / 255) * (asciiChars.length - 1));
+        asciiCtx.fillStyle = `rgb(${r},${g},${b})`;
+        asciiCtx.fillText(asciiChars[charIndex], x, y);
       }
-
-      asciiCtx.fillStyle = `rgb(${r},${g},${b})`;
-      asciiCtx.fillText(asciiChars[charIndex], x, y + cellSize);
     }
+
+    // アドレスとデータ値の追加
+    asciiCtx.font = '20px Arial';
+    asciiCtx.fillStyle = 'white';
+    asciiCtx.fillText(`Address: ${address}`, 10, 30);
+    asciiCtx.fillText(`Data: ${data}`, 10, 60);
+
+    // キャンバスをバッファに変換
+    const buf = asciiCanvas.toBuffer('image/png');
+
+    // レスポンスヘッダーの設定とバッファの送信
+    res.setHeader('Content-Type', 'image/png');
+    res.status(200).send(buf);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error', message: error.message });
   }
-
-  console.log(debugOutput);
-
-  // ASCII文字の分布を確認
-  const charCounts = {};
-  asciiChars.forEach((char) => (charCounts[char] = 0));
-
-  for (let y = 0; y < height; y += cellSize) {
-    for (let x = 0; x < width; x += cellSize) {
-      const pos = (y * width + x) * 4;
-      const avg = (pixels[pos] + pixels[pos + 1] + pixels[pos + 2]) / 3;
-      const charIndex = Math.floor((avg / 255) * (asciiChars.length - 1));
-      charCounts[asciiChars[charIndex]]++;
-    }
-  }
-
-  console.log('ASCII character distribution:', charCounts);
-
-  // アドレスとデータ値の追加
-  asciiCtx.font = '20px Arial';
-  asciiCtx.fillStyle = 'black';
-  asciiCtx.fillText(`Address: ${address}`, 10, 30);
-  asciiCtx.fillText(`Data: ${data}`, 10, 60);
-
-  // キャンバスをバッファに変換
-  const buf = asciiCanvas.toBuffer('image/png');
-
-  // レスポンスヘッダーの設定とバッファの送信
-  res.setHeader('Content-Type', 'image/png');
-  res.status(200).send(buf);
 }
