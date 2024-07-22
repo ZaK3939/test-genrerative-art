@@ -88,7 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('First 100 ASCII pixel values:', asciiPixels.slice(0, 400));
 
     // アドレスとデータ値の追加
-    asciiCtx.font = '20px Arial';
+    asciiCtx.font = '20px Roboto';
     asciiCtx.fillStyle = 'white';
     asciiCtx.fillText(`Address: ${address}`, 10, 30);
     asciiCtx.fillText(`Data: ${data}`, 10, 60);
