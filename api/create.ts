@@ -38,8 +38,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('Image data:', imageData.data);
     const pixels = imageData.data;
 
-    // ASCII変換
-    const asciiChars = ['@', '*', '+', '#', '&', '%', '_', ':', '£', '/', '-', 'X', 'W', ' '];
+    // ASCII変換処理
+    const asciiChars = ['@', '%', '#', '*', '+', '=', '-', ':', '.', ' '];
 
     // ASCIIアート用の新しいキャンバス
     const asciiCanvas = createCanvas(width, height);
@@ -49,18 +49,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     asciiCtx.font = `${cellSize}px monospace`;
     asciiCtx.textBaseline = 'top';
 
-    // for (let y = 0; y < height; y += cellSize) {
-    //   for (let x = 0; x < width; x += cellSize) {
-    //     const pos = (y * width + x) * 4;
-    //     const r = pixels[pos];
-    //     const g = pixels[pos + 1];
-    //     const b = pixels[pos + 2];
-    //     const avg = (r + g + b) / 3;
-    //     const charIndex = Math.floor((avg / 255) * (asciiChars.length - 1));
-    //     asciiCtx.fillStyle = `rgb(${r},${g},${b})`;
-    //     asciiCtx.fillText(asciiChars[charIndex], x, y);
-    //   }
-    // }
+    let debugOutput = '';
+    for (let y = 0; y < height; y += cellSize) {
+      for (let x = 0; x < width; x += cellSize) {
+        const pos = (y * width + x) * 4;
+        const r = pixels[pos];
+        const g = pixels[pos + 1];
+        const b = pixels[pos + 2];
+        const avg = (r + g + b) / 3;
+        const charIndex = Math.floor((avg / 255) * (asciiChars.length - 1));
+        const char = asciiChars[charIndex];
+
+        asciiCtx.fillStyle = `rgb(${r},${g},${b})`;
+        asciiCtx.fillText(char, x, y);
+
+        if (y < 50 && x < 50) {
+          debugOutput += `Pos: (${x},${y}), RGB: (${r},${g},${b}), Avg: ${avg}, Char: ${char}\n`;
+        }
+      }
+    }
+
+    console.log('Debug output:\n', debugOutput);
+
+    // asciiCtxの内容を確認
+    const asciiImageData = asciiCtx.getImageData(0, 0, width, height);
+    const asciiPixels = asciiImageData.data;
+    console.log('First 20 ASCII pixel values:', asciiPixels.slice(0, 80)); // RGBAなので80個表示
 
     // アドレスとデータ値の追加
     asciiCtx.font = '20px Arial';
@@ -70,6 +84,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // キャンバスをバッファに変換
     const buf = asciiCanvas.toBuffer('image/png');
+    console.log('Buffer created, length:', buf.length);
 
     // レスポンスヘッダーの設定とバッファの送信
     res.setHeader('Content-Type', 'image/png');
