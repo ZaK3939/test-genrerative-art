@@ -35,6 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // ピクセルデータの取得
     const imageData = ctx.getImageData(0, 0, width, height);
+    console.log('Image data:', imageData.data);
     const pixels = imageData.data;
 
     // ASCII変換
