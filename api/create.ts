@@ -35,17 +35,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const imageBuffer = fs.readFileSync(imagePath);
   const base64Image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
-  console.log('base64Image', base64Image);
-
-  // Base64画像を読み込み
   const image = await loadImage(base64Image);
-
-  // 画像の描画
   ctx.drawImage(image, 0, 0, width, height);
-
-  // ピクセルデータの取得
   const imageData = ctx.getImageData(0, 0, width, height);
-  console.log('imageData', imageData);
   const pixels = imageData.data;
 
   // ASCII変換
@@ -54,10 +46,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // ASCIIアート用の新しいキャンバス
   const asciiCanvas = createCanvas(width, height);
   const asciiCtx = asciiCanvas.getContext('2d');
-  asciiCtx.fillStyle = 'black';
+  asciiCtx.fillStyle = 'white';
   asciiCtx.fillRect(0, 0, width, height);
   asciiCtx.font = `${cellSize}px monospace`;
-  console.log('cellSize', cellSize);
 
   for (let y = 0; y < height; y += cellSize) {
     for (let x = 0; x < width; x += cellSize) {
@@ -66,16 +57,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const g = pixels[pos + 1];
       const b = pixels[pos + 2];
       const avg = (r + g + b) / 3;
-      const charIndex = Math.floor((avg / 256) * asciiChars.length);
-      const color = `rgb(${r},${g},${b})`;
-      asciiCtx.fillStyle = color;
+      const charIndex = Math.floor((avg / 255) * (asciiChars.length - 1));
+      asciiCtx.fillStyle = `rgb(${r},${g},${b})`;
       asciiCtx.fillText(asciiChars[charIndex], x, y + cellSize);
     }
   }
 
   // アドレスとデータ値の追加
   asciiCtx.font = '20px Arial';
-  asciiCtx.fillStyle = 'white';
+  asciiCtx.fillStyle = 'black';
   asciiCtx.fillText(`Address: ${address}`, 10, 30);
   asciiCtx.fillText(`Data: ${data}`, 10, 60);
 
