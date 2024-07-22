@@ -5,7 +5,7 @@ import path from 'path';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    const { address = '0x0', data = '0' } = req.query;
+    const { address = '0x0', data = '0', option } = req.query;
 
     const dataValue = parseInt(data as string, 10);
     const maxValue = 1000;
@@ -23,9 +23,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // 画像ファイルを読み込み、Base64に変換
     const imagePath = path.join(process.cwd(), 'assets', 'images', 'uniswap.png');
+    console.log('Image path:', imagePath);
     const imageBuffer = fs.readFileSync(imagePath);
     const base64Image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
-
+    if (!option) {
+      return res.status(200).json({ base64Image });
+    }
     // Base64画像を読み込み
     const image = await loadImage(base64Image);
     console.log('Image loaded:', image.width, image.height);
