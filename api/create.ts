@@ -21,7 +21,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
 
-  // 画像の読み込み
   const imagePath = path.join(process.cwd(), 'assets', 'images', 'uniswap.png');
   const image = await loadImage(fs.readFileSync(imagePath));
 
@@ -30,6 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ピクセルデータの取得
   const imageData = ctx.getImageData(0, 0, width, height);
+  console.log('imageData', imageData);
   const pixels = imageData.data;
 
   // ASCII変換
