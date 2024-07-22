@@ -11,6 +11,7 @@
     "@types/node": "^20.13.0",
     "typescript": "^5.4.5"
   },
+  "type": "module",
   "dependencies": {
     "@napi-rs/canvas": "^0.1.52",
     "@vercel/node": "^3.1.6"
